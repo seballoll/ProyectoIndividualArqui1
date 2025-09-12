@@ -1,9 +1,9 @@
     .section .text
-    .global tea_encrypt
-    .type tea_encrypt, @function
+    .global tea_encrypt_asm
+    .type tea_encrypt_asm, @function
 
 
-tea_encrypt:
+tea_encrypt_asm:
 
     # a0 = ptr v (v[0], v[1])
     # a1 = ptr key (key[0..3])
@@ -15,8 +15,7 @@ tea_encrypt:
     # a3,a4,a5 = temporaries
 
     # Save return address
-    li s0, -16
-    add sp, sp, s0
+    addi sp, sp, -16
     sw ra, 12(sp)
     sw s0, 8(sp)
     sw s1, 4(sp)
@@ -69,8 +68,7 @@ encrypt_loop:
     xor   a3, a3, a5
     add   t1, t1, a3           # v1 += a3
 
-    li s1, -1
-    add a2, a2, s1           # rounds--
+    addi a2, a2, -1           # rounds--
     bnez  a2, encrypt_loop
 
 end_encrypt:
@@ -83,25 +81,19 @@ end_encrypt:
     lw s0, 8(sp)
     lw s1, 4(sp)
     lw s2, 0(sp)
-    
-    # Restore stack pointer
-    li t0, 16
-    add sp, sp, t0
+    addi sp, sp, 16
 
     ret
 
-    .size tea_encrypt, .-tea_encrypt
 
-
-    .global tea_decrypt
-    .type tea_decrypt, @function
-tea_decrypt:
+    .global tea_decrypt_asm
+    .type tea_decrypt_asm, @function
+tea_decrypt_asm:
     # a0 = ptr v, a1 = ptr key
     # same register usage as encrypt
 
-     # Save return address
-    li s0, -16
-    add sp, sp, s0
+    # Save return address
+    addi sp, sp, -16
     sw ra, 12(sp)
     sw s0, 8(sp)
     sw s1, 4(sp)
@@ -116,10 +108,7 @@ tea_decrypt:
     lw    t5, 12(a1)       # key3
 
     # sum = DELTA * 32 mod 2^32 = 0xC6EF3720
-    li    t6, 0xC6EF
-    slli  t6, t6, 16
-    li    s1, 0x3720
-    add   t6, t6, s1    # t6 = 0xC6EF3720
+    li    t6, 0xC6EF3720    # t6 = 0xC6EF3720
 
     li    a2, 32           # rounds
 
@@ -149,8 +138,7 @@ decrypt_loop:
     li     a3 , 0x9E3779B9
     sub   t6, t6, a3
 
-    li s1, -1
-    add a2, a2, s1
+    addi a2, a2, -1
     bnez  a2, decrypt_loop
 
     sw    t0, 0(a0)
@@ -161,12 +149,7 @@ decrypt_loop:
     lw s0, 8(sp)
     lw s1, 4(sp)
     lw s2, 0(sp)
-    
-    # Restore stack pointer
-    li t0, 16
-    add sp, sp, t0
+    addi sp, sp, 16
 
     ret
-
-    .size tea_decrypt, .-tea_decrypt
 

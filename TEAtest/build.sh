@@ -50,7 +50,7 @@ riscv64-unknown-elf-gcc \
     -o TEAA.o
 
 if [ $? -ne 0 ]; then
-    echo "Math assembly compilation failed"
+    echo "Encryption assembly compilation failed"
     exit 1
 fi
 
